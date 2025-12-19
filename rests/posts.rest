@@ -1,0 +1,68 @@
+POST http://localhost:3000/api/posts HTTP/1.1
+content-type: application/json
+
+{
+    "title": "sample-1",
+    "content": "My first post",
+    "sender_id": "64a7f0c2e1b2c3d4e5f6a7b8"
+}
+
+###
+
+POST http://localhost:3000/api/posts HTTP/1.1
+content-type: application/json
+
+{
+    "title": "sample-2",
+    "content": "My second post",
+    "sender_id": "64a7f0c2e1b2c3d4e5f6a7b8"
+}
+
+###
+
+POST http://localhost:3000/api/posts HTTP/1.1
+content-type: application/json
+
+{
+    "title": "sample-3",
+    "content": "My third post",
+    "sender_id": "64a7f0c2e1b2c3d4e5f6a7b8"
+}
+
+###
+
+POST http://localhost:3000/api/posts HTTP/1.1
+content-type: application/json
+
+{
+    "title": "new-author",
+    "content": "My first post",
+    "sender_id": "64a7f1d3e1b2c3d4e5f6a7b9"
+}
+
+###
+
+GET http://localhost:3000/api/posts
+
+###
+
+GET http://localhost:3000/api/posts/69454945d27e120c877dbed2
+
+###
+
+DELETE http://localhost:3000/api/posts/69454945d27e120c877dbed2
+
+###
+
+PUT http://localhost:3000/api/posts/69454965d27e120c877dbed8
+content-type: application/json
+
+{
+    "title": "updated-sample-3",
+    "content": "My updated third post",
+    "sender_id": "64a7f0c2e1b2c3d4e5f6a7b8"
+}
+
+###
+
+GET http://localhost:3000/api/posts?sender_id=64a7f0c2e1b2c3d4e5f6a7b8
