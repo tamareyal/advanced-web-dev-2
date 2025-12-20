@@ -1,0 +1,65 @@
+POST http://localhost:3000/api/comments HTTP/1.1
+Content-Type: application/json
+
+{
+    "message": "This is my first comment",
+    "post_id": "650e8c8f4f1c2b001234abcd",
+    "sender_id": "650e8c8f4f1c2b009876fedc"
+}
+
+###
+
+POST http://localhost:3000/api/comments HTTP/1.1
+Content-Type: application/json
+
+{
+    "message": "Different user same post",
+    "post_id": "650e8c8f4f1c2b001234abcd",
+    "sender_id": "650e8c8f4f1c2b009876fedd"
+}
+
+###
+
+POST http://localhost:3000/api/comments HTTP/1.1
+Content-Type: application/json
+
+{
+    "message": "Different user different post",
+    "post_id": "650e8c8f4f1c2b001234abce",
+    "sender_id": "650e8c8f4f1c2b009876fedd"
+}
+
+###
+
+GET http://localhost:3000/api/comments
+
+###
+
+GET http://localhost:3000/api/comments?sender_id=650e8c8f4f1c2b009876fedd
+
+###
+
+GET http://localhost:3000/api/comments/posts/650e8c8f4f1c2b001234abcd
+
+###
+
+DELETE http://localhost:3000/api/comments/694590c1c57e99e3352be9e1
+
+###
+
+PUT http://localhost:3000/api/comments/69458dd391e03dbf25e4c38d
+Content-Type: application/json  
+
+{
+    "message": "Updated comment message"
+}
+
+###
+
+GET http://localhost:3000/api/comments
+
+
+
+
+
+
