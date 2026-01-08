@@ -12,7 +12,7 @@ router.post("/", commentsController.create);
 // Route to get a specific comment by ID
 router.get("/:id", commentsController.getById);
 
-// Route to get a specific post by ID
+// Route to get a specific comment by post ID
 router.get("/posts/:postId", commentsController.getByPostId);
 
 // Route to update a specific comment by ID
