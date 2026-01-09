@@ -2,13 +2,17 @@
   "scripts": {
     "start": "tsc && node ./dist/server.js",
     "lint": "eslint . --ext .ts",
-    "dev": "nodemon server.ts"
+    "dev": "nodemon server.ts",
+    "test": "tsc && jest --runInBand --detectOpenHandles --forceExit --testPathPatterns=tests/.*.test.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@types/jest": "^30.0.0",
     "eslint": "^9.39.2",
     "globals": "^16.5.0",
+    "jest": "^30.2.0",
     "nodemon": "^3.1.11",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.50.0"
   },
