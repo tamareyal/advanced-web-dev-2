@@ -2,6 +2,7 @@ import CommentsModel, { Comment } from '../models/comments';
 import BaseController from './baseController';
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
+import { authenticate } from "../middlewares/authMiddleware";
 
 class CommentsController extends BaseController<Comment> {
     constructor() {
