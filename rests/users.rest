@@ -1,0 +1,31 @@
+POST http://localhost:3000/api/users HTTP/1.1
+content-type: application/json
+
+{
+    "name": "test-user-1",
+    "email": "test-user-1@example.com",
+    "password": "securepassword123"
+}
+
+###
+
+GET http://localhost:3000/api/users HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/users/69612ea657f998d2d7383fc6 HTTP/1.1
+
+###
+
+PUT http://localhost:3000/api/users/69612ea657f998d2d7383fc6 HTTP/1.1
+content-type: application/json
+
+{
+    "name": "updated-test-user-1",
+    "email": "updated-test-user-1@example.com",
+    "password": "newsecurepassword456"
+}
+
+###
+
+DELETE http://localhost:3000/api/users/69612ea657f998d2d7383fc6 HTTP/1.1

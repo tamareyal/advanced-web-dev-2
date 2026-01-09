@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import postsRouter from "./routes/postsRoutes";
 import commentsRouter from "./routes/commentsRoutes";
+import usersRouter from "./routes/usersRoutes";
 
 const app = express();
 dotenv.config({ path: ".env" });
@@ -16,6 +17,7 @@ function init(): Promise<Express> {
 
     app.use("/api/posts", postsRouter);
     app.use("/api/comments", commentsRouter);
+    app.use("/api/users", usersRouter);
 
     const mongoURL = MONGO_URI;
     if (!mongoURL) {
