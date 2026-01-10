@@ -1,11 +1,15 @@
-import init from "./index";
+import dotenv from "dotenv";
+import startServer from "./index";
 
-const PORT = process.env.PORT || 3000;
+dotenv.config({ path: ".env" });
 
-init().then((app) => {
-  app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-  });
-}).catch((error) => {
-  console.error("Failed to initialize the server:", error);
+const PORT = Number(process.env.PORT) || 3000;
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/mydatabase";
+
+async function main() {
+  await startServer(PORT, MONGO_URI);
+}
+
+main().catch(() => {
+  process.exit(1);
 });
