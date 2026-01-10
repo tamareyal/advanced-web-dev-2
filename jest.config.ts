@@ -6,6 +6,7 @@ const config: Config = {
     testEnvironment: "node",
     setupFiles: ["./jest.setup.ts"],
     roots: ["<rootDir>/tests/"],
+    bail: true,
 };
 
 export default config;
