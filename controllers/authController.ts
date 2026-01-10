@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import User from '../models/users';
-import usersController from './usersController';
+import UserModel from '../models/users';
 
 
 const generateToken = (userId: string): { token: string; refreshToken: string } => {
@@ -28,7 +27,7 @@ const register = async (req: Request, res: Response) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const user = await usersController.model.create({
+        const user = await UserModel.create({
                 name: username,
                 email,
                 password: hashedPassword,
@@ -89,7 +88,7 @@ const refreshToken = async (req: Request, res: Response) => {
         const decoded: jwt.JwtPayload = jwt.verify(refreshToken, secretKey) as jwt.JwtPayload;
         const userId = decoded.userId;
         
-        const user = await usersController.model.findById(userId);
+        const user = await UserModel.findById(userId);
         if (!user)
             return res.status(401).json({ message: 'Invalid refresh token' })
         if (!user.refreshTokens.includes(refreshToken)) {
