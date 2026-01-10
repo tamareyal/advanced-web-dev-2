@@ -1,46 +1,56 @@
 import express, { Express } from "express";
-import mongoose from "mongoose";
-import dotenv from "dotenv";
 import postsRouter from "./routes/postsRoutes";
 import commentsRouter from "./routes/commentsRoutes";
 import usersRouter from "./routes/usersRoutes";
+import mongoose from "mongoose";
 
-const app = express();
-dotenv.config({ path: ".env" });
+async function startServer(port: number, mongoURL: string): Promise<mongoose.Connection | void> {
+  try {
+    const connection = await connectToDatabase(mongoURL);
 
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/mydatabase";
-
-function init(): Promise<Express> {
-    const promise = new Promise<Express>((resolve, reject) => {
-    app.use(express.urlencoded({ extended: false }));
-    app.use(express.json());
-
-    app.use("/api/posts", postsRouter);
-    app.use("/api/comments", commentsRouter);
-    app.use("/api/users", usersRouter);
-
-    const mongoURL = MONGO_URI;
-    if (!mongoURL) {
-      console.error("MONGODB_URI is not defined in the environment variables.");
-      reject(new Error("MONGODB_URI is not defined"));
-    } else {
-      mongoose
-        .connect(mongoURL, {})
-        .then(() => {
-          resolve(app);
-        });
-    }
-
-    const db = mongoose.connection;
-    db.on("error", (error) => {
-      console.error(error);
+    const app = setupExpress();
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
     });
-    db.once("open", () => {
-      console.log("Connected to MongoDB");
-    });
-  });
 
-  return promise;
+    return connection;
+  } catch (error) {
+    console.error(`Failed to start server: ${error}`);
+    throw error;
+  }
 }
 
-export default init;
+function setupExpress(): Express {
+  const app = express();    
+  app.use(express.urlencoded({ extended: false }));
+  app.use(express.json());
+
+  app.use("/api/posts", postsRouter);
+  app.use("/api/comments", commentsRouter);
+  app.use("/api/users", usersRouter);
+
+  return app;
+}
+
+async function connectToDatabase(mongoURL: string): Promise<mongoose.Connection> {
+  if (!mongoURL) {
+    throw new Error("MONGODB_URI is not defined");
+  }
+
+  try {
+    await mongoose.connect(mongoURL, {});
+    console.log("Connected to MongoDB");
+    
+    const conn = mongoose.connection;
+    conn.on("error", (error) => {
+        console.error(error);
+    });
+
+    return conn;
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error);
+    throw error;
+  }
+}
+
+export default startServer
