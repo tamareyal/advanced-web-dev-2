@@ -26,6 +26,7 @@ class PostsController extends BaseController<Post> {
             return res.status(201).json(data);
         } catch (error) {
             return res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
+
         }
     }
 
