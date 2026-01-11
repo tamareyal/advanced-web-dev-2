@@ -1,7 +1,5 @@
 import request from "supertest";
-import PostsModel, { Post } from '../models/posts';
-import mongoose from "mongoose";
-import { serverURL, posts, PostConcrete } from "./mockdata";
+import { serverURL, posts } from "./mockdata";
 import TestUser from "./misc/auth";
 
 
@@ -15,6 +13,8 @@ describe("Posts API", () => {
 
     beforeAll(async () => {
         await testUser.registerUser(serverURL);
+        expect(testUser.id).toBeDefined();
+        expect(testUser.accessToken).toBeDefined();
     });
 
     beforeEach(async () => {

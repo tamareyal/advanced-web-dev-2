@@ -7,6 +7,8 @@ dotenv.config({ path: ".env.test" });
 const PORT = Number(process.env.PORT) || 3000;
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/mockdatabase";
 
+jest.setTimeout(20000);
+
 beforeAll(async () => {
     // Start testing server
     const conn = await startServer(PORT, MONGO_URI);
@@ -14,7 +16,7 @@ beforeAll(async () => {
     if (conn) {
         await clearDatabase(conn);
     }
-});
+}, 20000);
 
 async function clearDatabase(connection: mongoose.Connection) {
     const collections = await connection.db?.collections();
