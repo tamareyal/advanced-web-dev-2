@@ -8,12 +8,12 @@ class PostsController extends BaseController<Post> {
         super(PostsModel);
     }
 
-    create = async (req: Request, res: Response) => {
-        const authReq = req as AuthenticatedRequest;
+    create = async (req: AuthenticatedRequest, res: Response) => {
+        const authReq = req;
         const body = req.body;
         const senderId = authReq.userId;
         if (!senderId) {
-            return res.status(401).json({ message: 'Unauthenticated' });
+            res.status(401).json({ message: 'Unauthenticated' });
         }
         body.sender_id = senderId;
 
