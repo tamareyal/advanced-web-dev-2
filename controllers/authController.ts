@@ -10,7 +10,7 @@ const generateToken = (userId: string): { token: string; refreshToken: string } 
     const tokenExp: number = Number(process.env.JWT_EXPIRES_IN)  || 3000;
     const refTokenExp: number = Number(process.env.REFRESH_TOKEN_EXPIRES_IN) || 86400;
 
-    const token = jwt.sign({ userId: userId, nonce: Math.random().toString(36).substring(2, 15) }, secretKey, { expiresIn: tokenExp });
+    const token = jwt.sign({ userId: userId, tokenType: 'access', nonce: Math.random().toString(36).substring(2, 15) }, secretKey, { expiresIn: tokenExp });
     const refreshToken = jwt.sign({ userId: userId, tokenType: 'refresh', nonce: Math.random().toString(36).substring(2, 15) }, secretKey, { expiresIn: refTokenExp });
 
     return { token, refreshToken };
