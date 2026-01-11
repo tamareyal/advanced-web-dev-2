@@ -13,9 +13,9 @@ class BaseController<T> {
         const filter = req.query;
         try {
             const data = await this.model.find(filter);
-            res.status(200).json(data);
+            return res.status(200).json(data);
         } catch (error) {
-            res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
+            return res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
         }
     };
 
@@ -26,9 +26,9 @@ class BaseController<T> {
             if (!data) {
                 return res.status(404).json({ message: "Resource not found" });
             }
-            res.status(200).json(data);
+            return res.status(200).json(data);
         } catch (error) {
-            res.status(500).json({ message: error instanceof Error ? error.message : "Error" });
+            return res.status(500).json({ message: error instanceof Error ? error.message : "Error" });
         }
     };
 
@@ -38,9 +38,9 @@ class BaseController<T> {
         const body = req.body;
         try {
             const data = await this.model.create(body);
-            res.status(201).json(data);
+            return res.status(201).json(data);
         } catch (error) {
-            res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
+            return res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
         }
     };
 
@@ -54,9 +54,9 @@ class BaseController<T> {
             if (!data) {
                 return res.status(404).json({ message: "Resource not found" });
             }
-            res.status(200).json(data);
+            return res.status(200).json(data);
         } catch (error) {
-            res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
+            return res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
         }
     };
 
@@ -67,9 +67,9 @@ class BaseController<T> {
             if (!data) {
                 return res.status(404).json({ message: "Resource not found" });
             }
-            res.status(200).json({ message: "Deleted successfully" });
+            return res.status(200).json({ message: "Deleted successfully" });
         } catch (error) {
-            res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
+            return res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
         }
     };
 }

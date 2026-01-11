@@ -23,9 +23,9 @@ class UsersController extends BaseController<User> {
             if (!data) {
                 return res.status(404).json({ message: "Resource not found" });
             }
-            res.status(200).json(data);
+            return res.status(200).json(data);
         } catch (error) {
-            res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
+            return res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
         }
     };
 }
