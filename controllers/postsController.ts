@@ -9,19 +9,23 @@ class PostsController extends BaseController<Post> {
     }
 
     create = async (req: AuthenticatedRequest, res: Response) => {
-        const authReq = req;
         const body = req.body;
-        const senderId = authReq.userId;
+        const senderId = req.userId;
+
+        if (body.sender_id) {
+            return res.status(400).json({ message: 'sender_id cannot be set manually' });
+        }
+
         if (!senderId) {
-            res.status(401).json({ message: 'Unauthenticated' });
+            return res.status(401).json({ message: 'Unauthenticated' });
         }
         body.sender_id = senderId;
 
         try {
             const data = await this.model.create(body);
-            res.status(201).json(data);
+            return res.status(201).json(data);
         } catch (error) {
-            res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
+            return res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
         }
     }
 
