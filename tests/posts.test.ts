@@ -1,11 +1,10 @@
 import request from "supertest";
 import { serverURL, posts } from "./mockdata";
 import { testUser } from "../jest.setup";
+import TestUser from "./misc/auth";
 
 
 describe("Posts API", () => {
-
-
     test("Create Posts", async () => {
         for (const postData of posts) {
             const res = await request(serverURL)
@@ -27,6 +26,34 @@ describe("Posts API", () => {
         }
     });
 
+    test("Get All Posts", async () => {
+        const res = await request(serverURL)
+            .get("/api/posts")
+            .set("Authorization", `Bearer ${testUser.accessToken}`);
+        
+        expect(res.status).toBe(200);
+        
+        for (let i = 0; i < posts.length; i++) {
+            expect(res.body[i]._id).toBe(posts[i]._id);
+            expect(res.body[i].title).toBe(posts[i].title);
+            expect(res.body[i].content).toBe(posts[i].content);
+            expect(res.body[i].sender_id).toBe(posts[i].sender_id);
+        }
+    });
+
+    test("Get Post by ID", async () => {
+        const postToGet = posts[1];
+        const res = await request(serverURL)
+            .get(`/api/posts/${postToGet._id}`)
+            .set("Authorization", `Bearer ${testUser.accessToken}`);
+        
+        expect(res.status).toBe(200);
+        expect(res.body._id).toBe(postToGet._id);
+        expect(res.body.title).toBe(postToGet.title);
+        expect(res.body.content).toBe(postToGet.content);
+        expect(res.body.sender_id).toBe(postToGet.sender_id);
+    });
+
     test("Update a Post", async () => {
         const postToUpdate = posts[0];
         const updatedContent = {
@@ -46,5 +73,78 @@ describe("Posts API", () => {
         posts[0].title = res.body.title;
         posts[0].content = res.body.content;
         posts[0].updatedAt = res.body.updatedAt;
+    });
+
+    test("Delete a Post", async () => {
+        const postToDelete = posts[2];
+        
+        const res = await request(serverURL)
+            .delete(`/api/posts/${postToDelete._id}`)
+            .set("Authorization", `Bearer ${testUser.accessToken}`);
+        
+        expect(res.status).toBe(200);
+        
+        const getRes = await request(serverURL)
+            .get(`/api/posts/${postToDelete._id}`)
+            .set("Authorization", `Bearer ${testUser.accessToken}`);
+        
+        expect(getRes.status).toBe(404);
+    });
+
+    test("Create Post without Authentication", async () => {
+        const postData = {
+            title: "Unauthorized Post",
+            content: "This post should not be created."
+        };
+        
+        const res = await request(serverURL)
+            .post("/api/posts")
+            .send(postData);
+
+        expect(res.status).toBe(401);
+    });
+
+    test("Create Post with sender_id in Body should not work", async () => {
+        const postData = {
+            title: "Invalid Post",
+            content: "This post has sender_id set.",
+            sender_id: "someuserid"
+        };
+        
+        const res = await request(serverURL)
+            .post("/api/posts")
+            .set("Authorization", `Bearer ${testUser.accessToken}`)
+            .send(postData);
+
+        expect(res.status).toBe(400);
+    });
+
+    test("Attempt to Delete a Post as another User", async () => {
+        const tempUser = new TestUser(
+            "tempuser",
+            "tempuser@example.com",
+            "tempPassword123"
+        );
+        await tempUser.registerUser(serverURL);
+
+        const postToDelete = posts[0];
+        
+        const res = await request(serverURL)
+            .delete(`/api/posts/${postToDelete._id}`)
+            .set("Authorization", `Bearer ${tempUser.accessToken}`);
+        
+        expect(res.status).toBe(403);
+        expect(res.body.message).toBe("Forbidden: unable to perform operation on resource not owned by you");
+    });
+
+    test("Get Non-Existent Post", async () => {
+        const nonExistentPostId = "64b7f8f8f8f8f8f8f8f8f8f8";
+        
+        const res = await request(serverURL)
+            .get(`/api/posts/${nonExistentPostId}`)
+            .set("Authorization", `Bearer ${testUser.accessToken}`);
+        
+        expect(res.status).toBe(404);
+        expect(res.body.message).toBe("Resource not found");
     });
 });
