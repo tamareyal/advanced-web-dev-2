@@ -3,7 +3,10 @@
     "start": "tsc && node ./dist/server.js",
     "lint": "eslint . --ext .ts",
     "dev": "nodemon server.ts",
-    "test": "tsc && jest --runInBand --detectOpenHandles --forceExit --testPathPatterns=tests/.*.test.ts"
+    "test": "tsc && jest --runInBand --detectOpenHandles --forceExit --testPathPatterns=tests/.*.test.ts",
+    "testComments": "tsc && jest --runInBand --detectOpenHandles --forceExit --testPathPatterns=tests/comments.test.ts",
+    "testPosts": "tsc && jest --runInBand --detectOpenHandles --forceExit --testPathPatterns=tests/posts.test.ts"
+
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
