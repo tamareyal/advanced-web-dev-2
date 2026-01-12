@@ -25,8 +25,35 @@ const posts: PostConcrete[] = [
     }
 ];
 
+type CommentConcrete = {
+    _id?: string;
+    message: string;
+    post_id: string;
+    sender_id?: string;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+
+const comments: CommentConcrete[] = [
+    {
+        message: "This is a comment on the first post.",
+        post_id: "507f1f77bcf86cd799439011",
+    },
+    {
+        message: "This is another comment on the first post.",
+        post_id: "507f1f77bcf86cd799439011",
+    },
+    {
+        message: "This is a comment on the second post.",
+        post_id: "507f1f77bcf86cd799439012",
+    }
+];
+
 export { 
     serverURL, 
     posts, 
-    PostConcrete 
+    PostConcrete,
+    comments,
+    CommentConcrete
 };
