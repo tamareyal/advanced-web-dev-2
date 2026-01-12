@@ -1,11 +1,19 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import startServer from "./index";
+import TestUser from "./tests/misc/auth";
+import { serverURL } from "./tests/mockdata";
 
 dotenv.config({ path: ".env.test" });
 
 const PORT = Number(process.env.PORT) || 3000;
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/mockdatabase";
+// Create TestUser for authenticated interaction with the server
+const testUser = new TestUser(
+    "Tester", 
+    "tester@example.com",
+    "securePassword123"
+);
 
 jest.setTimeout(20000);
 
@@ -18,6 +26,18 @@ beforeAll(async () => {
     }
 }, 20000);
 
+beforeAll(async () => {
+    await testUser.registerUser(serverURL);
+    expect(testUser.id).toBeDefined();
+    expect(testUser.accessToken).toBeDefined();
+});
+
+beforeEach(async () => {
+    const oldAccessToken = testUser.accessToken;
+    await testUser.refreshTokens(serverURL);
+    expect(testUser.accessToken).not.toBe(oldAccessToken);
+});
+
 async function clearDatabase(connection: mongoose.Connection) {
     const collections = await connection.db?.collections();
     if (collections) {
@@ -26,4 +46,6 @@ async function clearDatabase(connection: mongoose.Connection) {
         }
     }
 }
+
+export { testUser };
 

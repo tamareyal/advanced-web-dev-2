@@ -1,32 +1,13 @@
 import request from "supertest";
 import { serverURL, posts } from "./mockdata";
-import TestUser from "./misc/auth";
+import { testUser } from "../jest.setup";
 
 
 describe("Posts API", () => {
-    // Create TestUser for authenticated interaction with the server
-    const testUser = new TestUser(
-        "PostTester", 
-        "posttester@example.com",
-        "securePassword123"
-    );
 
-    beforeAll(async () => {
-        await testUser.registerUser(serverURL);
-        expect(testUser.id).toBeDefined();
-        expect(testUser.accessToken).toBeDefined();
-    });
-
-    beforeEach(async () => {
-        const oldAccessToken = testUser.accessToken;
-        await testUser.refreshTokens(serverURL);
-        expect(testUser.accessToken).not.toBe(oldAccessToken);
-    });
 
     test("Create Posts", async () => {
         for (const postData of posts) {
-            // TODO: Ensure sender_id is set correctly on post create automatically using the userId provided in side the authentication middleware
-            postData.sender_id = testUser.id;
             const res = await request(serverURL)
                 .post("/api/posts")
                 .set("Authorization", `Bearer ${testUser.accessToken}`)
@@ -37,6 +18,7 @@ describe("Posts API", () => {
             expect(res.body).toHaveProperty("sender_id");
             expect(res.body.title).toBe(postData.title);
             expect(res.body.content).toBe(postData.content);
+            expect(res.body.sender_id).toBe(testUser.id);
 
             postData._id = res.body._id;
             postData.sender_id = res.body.sender_id;
