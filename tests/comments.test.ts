@@ -162,4 +162,19 @@ describe("Comments API", () => {
         expect(res.status).toBe(404);
         expect(res.body.message).toBe("Resource not found");
     });
+
+    test("Create Comment with Malformed Data", async () => {
+        const malformedCommentData = {
+            _id: "invalidid",
+            message: 12345,
+            post_id: true
+        };
+        
+        const res = await request(serverURL)
+            .post("/api/comments")
+            .set("Authorization", `Bearer ${testUser.accessToken}`)
+            .send(malformedCommentData);
+        
+        expect(res.status).toBe(500);
+    });
 });
