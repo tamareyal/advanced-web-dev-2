@@ -35,12 +35,16 @@ class CommentsController extends BaseController<Comment> {
         }
         body.sender_id = senderId;
 
+        if (!body || !body.post_id || !body.message) {
+            return res.status(400).json({ message: "post_id and message are required" });
+        }
+
         try {
             const data = await this.model.create(body);
             return res.status(201).json(data);
         } catch (error) {
             console.log(error);
-            return res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
+            return res.status(500).json({ message: error instanceof Error ? error.message : "Error" });
 
         }
     }

@@ -2,6 +2,7 @@ import request from "supertest";
 import { serverURL, posts } from "./mockdata";
 import { testUser } from "../jest.setup";
 import TestUser from "./misc/auth";
+import PostModel from "../models/posts";
 
 
 describe("Posts API", () => {
@@ -137,6 +138,24 @@ describe("Posts API", () => {
         expect(res.body.message).toBe("Forbidden: unable to perform operation on resource not owned by you");
     });
 
+
+        test("Attempt to update with a different user", async () => {
+        const tempUser = new TestUser(
+            "tempuser2",
+            "tempuser2@example.com",
+            "tempPassword123"
+        );
+        await tempUser.registerUser(serverURL);
+
+        const res = await request(serverURL)
+            .put(`/api/posts/${posts[0]._id}`)
+            .set("Authorization", `Bearer ${tempUser.accessToken}`)
+            .send({ title: "Trying to update another user's post", content: "Trying to update another user's post content" });
+        
+        expect(res.status).toBe(403);
+        expect(res.body.message).toBe("Forbidden: unable to perform operation on resource not owned by you");
+    });
+
     test("Get Non-Existent Post", async () => {
         const nonExistentPostId = "64b7f8f8f8f8f8f8f8f8f8f8";
         
@@ -146,5 +165,51 @@ describe("Posts API", () => {
         
         expect(res.status).toBe(404);
         expect(res.body.message).toBe("Resource not found");
+    });
+
+    test("Create Post -> returns 500 when DB errors", async () => {
+        jest.spyOn(PostModel, "create").mockRejectedValueOnce(new Error("DB failure"));
+        const postData = {
+            title: "DB Error Post",
+            content: "This post should trigger a DB error."
+        };
+        const res = await request(serverURL)
+            .post("/api/posts")
+            .set("Authorization", `Bearer ${testUser.accessToken}`)
+            .send(postData);
+        expect(res.status).toBe(500);
+        expect(res.body).toHaveProperty("message");
+    });
+
+
+    test("Get all posts -> returns 500 when DB errors", async () => {
+    jest.spyOn(PostModel, "find").mockRejectedValueOnce(new Error("DB failure"));
+    const res = await request(serverURL)
+        .get("/api/posts")
+        .set("Authorization", `Bearer ${testUser.accessToken}`);
+    expect(res.status).toBe(500);
+    expect(res.body).toHaveProperty("message");
+    });
+
+
+    test("Update posts -> returns 500 when DB errors", async () => {
+        jest.spyOn(PostModel, "findByIdAndUpdate").mockRejectedValueOnce(new Error("DB failure"));
+        const res = await request(serverURL)
+            .put(`/api/posts/${posts[0]._id}`)
+            .set("Authorization", `Bearer ${testUser.accessToken}`)
+            .send({ title: "won't save", content: "won't save" });
+        expect(res.status).toBe(500);
+        expect(res.body).toHaveProperty("message");
+    });
+
+
+    // this test does not work and return 400 please fix
+    test("Delete post -> returns 500 when DB errors", async () => {
+        jest.spyOn(PostModel, "findByIdAndDelete").mockRejectedValueOnce(new Error("DB failure"));
+        const res = await request(serverURL)
+            .delete(`/api/posts/${posts[0]._id}`)
+            .set("Authorization", `Bearer ${testUser.accessToken}`);
+        expect(res.status).toBe(500);
+        expect(res.body).toHaveProperty("message");
     });
 });
