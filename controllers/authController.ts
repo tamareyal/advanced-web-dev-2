@@ -36,10 +36,10 @@ const register = async (req: Request, res: Response) => {
         const tokens = generateToken(user._id.toString());
         user.refreshTokens.push(tokens.refreshToken);
         await user.save();
-        res.status(201).json({ ...tokens, userId: user._id.toString() });
+        return res.status(201).json({ ...tokens, userId: user._id.toString() });
     }
     catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return res.status(500).json({ message: 'Server error', error });
     }
 }
 
@@ -69,10 +69,10 @@ const login = async (req: Request, res: Response) => {
         const tokens = generateToken(user._id.toString());
         user.refreshTokens.push(tokens.refreshToken);
         await user.save();
-        res.status(200).json({ ...tokens, userId: user._id.toString() });
+        return res.status(200).json({ ...tokens, userId: user._id.toString() });
     }
     catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return res.status(500).json({ message: 'Server error', error });
     }
 }
 
@@ -101,10 +101,11 @@ const refreshToken = async (req: Request, res: Response) => {
         user.refreshTokens = user.refreshTokens.filter(token => token !== refreshToken);
         user.refreshTokens.push(tokens.refreshToken);
         await user.save();
-        res.status(200).json({ ...tokens, userId: user._id.toString() });
+        return res.status(200).json({ ...tokens, userId: user._id.toString() });
     }
     catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        console.error('Error in refreshToken:', error);
+        return res.status(500).json({ message: 'Server error', error });
     }
 }
 
