@@ -2,6 +2,7 @@ import request from "supertest";
 import { serverURL, comments } from "./mockdata";
 import { testUser } from "../jest.setup";
 import TestUser from "./misc/auth";
+import CommentModel from "../models/comments";
 
 
 describe("Comments API", () => {
@@ -152,6 +153,23 @@ describe("Comments API", () => {
         expect(res.body.message).toBe("Forbidden: unable to perform operation on resource not owned by you");
     });
 
+        test("Attempt to update with a different user", async () => {
+        const tempUser = new TestUser(
+            "tempuser2",
+            "tempuser2@example.com",
+            "tempPassword123"
+        );
+        await tempUser.registerUser(serverURL);
+
+        const res = await request(serverURL)
+            .put(`/api/comments/${comments[0]._id}`)
+            .set("Authorization", `Bearer ${tempUser.accessToken}`)
+            .send({ message: "Trying to update another user's comment" });
+        
+        expect(res.status).toBe(403);
+        expect(res.body.message).toBe("Forbidden: unable to perform operation on resource not owned by you");
+    });
+
 
     test("Attempt to delete a non-existent Comment", async () => {
         const nonExistentCommentId = "64b7f8f8f8f8f8f8f8f8f8f8"; // Assuming this ID does not exist
@@ -162,4 +180,71 @@ describe("Comments API", () => {
         expect(res.status).toBe(404);
         expect(res.body.message).toBe("Resource not found");
     });
+
+
+    test("Create Comment missing required fields", async () => {
+        const res = await request(serverURL)
+            .post("/api/comments")
+            .set("Authorization", `Bearer ${testUser.accessToken}`)
+            .send({}); // missing message and post_id
+
+        expect(res.status).toBe(400);
+    });
+
+    test("Create Comment with invalid post_id format", async () => {
+        const res = await request(serverURL)
+            .post("/api/comments")
+            .set("Authorization", `Bearer ${testUser.accessToken}`)
+            .send({ message: "Hi", post_id: "invalid-id" });
+
+        expect(res.status).toBe(500);
+    });
+
+
+    test("Create Comment -> returns 500 when DB errors", async () => {
+        const commentData = {
+            message: "DB Error Comment",
+            post_id: "64b7f8f8f8f8f8f8f8f8f8f8"
+        };
+        jest.spyOn(CommentModel, "create").mockRejectedValueOnce(new Error("DB failure"));
+        const res = await request(serverURL)
+            .post("/api/comments")
+            .set("Authorization", `Bearer ${testUser.accessToken}`)
+            .send(commentData);
+        expect(res.status).toBe(500);
+        expect(res.body).toHaveProperty("message");
+    });
+
+
+    test("Get all comments -> returns 500 when DB errors", async () => {
+    jest.spyOn(CommentModel, "find").mockRejectedValueOnce(new Error("DB failure"));
+    const res = await request(serverURL)
+        .get("/api/comments")
+        .set("Authorization", `Bearer ${testUser.accessToken}`);
+    expect(res.status).toBe(500);
+    expect(res.body).toHaveProperty("message");
+    });
+
+
+    test("Update comment -> returns 500 when DB errors", async () => {
+        jest.spyOn(CommentModel, "findByIdAndUpdate").mockRejectedValueOnce(new Error("DB failure"));
+        const res = await request(serverURL)
+            .put(`/api/comments/${comments[0]._id}`)
+            .set("Authorization", `Bearer ${testUser.accessToken}`)
+            .send({ message: "won't save" });
+        expect(res.status).toBe(500);
+        expect(res.body).toHaveProperty("message");
+    });
+
+
+    // this test does not work and return 400 please fix
+    test("Delete comment -> returns 500 when DB errors", async () => {
+        jest.spyOn(CommentModel, "findByIdAndDelete").mockRejectedValueOnce(new Error("DB failure"));
+        const res = await request(serverURL)
+            .delete(`/api/comments/${comments[0]._id}`)
+            .set("Authorization", `Bearer ${testUser.accessToken}`);
+        expect(res.status).toBe(500);
+        expect(res.body).toHaveProperty("message");
+    });
+    
 });

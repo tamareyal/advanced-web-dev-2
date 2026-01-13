@@ -5,8 +5,8 @@
     "dev": "nodemon server.ts",
     "test": "tsc && jest --runInBand --detectOpenHandles --forceExit --testPathPatterns=tests/.*.test.ts",
     "testComments": "tsc && jest --runInBand --detectOpenHandles --forceExit --testPathPatterns=tests/comments.test.ts",
-    "testPosts": "tsc && jest --runInBand --detectOpenHandles --forceExit --testPathPatterns=tests/posts.test.ts"
-
+    "testPosts": "tsc && jest --runInBand --detectOpenHandles --forceExit --testPathPatterns=tests/posts.test.ts",
+    "testAuth": "tsc && jest --runInBand --detectOpenHandles --forceExit --testPathPatterns=tests/auth.test.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
