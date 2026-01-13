@@ -25,8 +25,7 @@ class PostsController extends BaseController<Post> {
             const data = await this.model.create(body);
             return res.status(201).json(data);
         } catch (error) {
-            return res.status(400).json({ message: error instanceof Error ? error.message : "Error" });
-
+            return res.status(500).json({ message: error instanceof Error ? error.message : "Error" });
         }
     }
 

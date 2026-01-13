@@ -147,4 +147,20 @@ describe("Posts API", () => {
         expect(res.status).toBe(404);
         expect(res.body.message).toBe("Resource not found");
     });
+
+    test("Create Post with Malformed Data", async () => {
+        const malformedPostData = {
+            _id: "invalidid",
+            title: 12345,
+            content: true
+        };
+        
+        const res = await request(serverURL)
+            .post("/api/posts")
+            .set("Authorization", `Bearer ${testUser.accessToken}`)
+            .send(malformedPostData);
+
+        expect(res.status).toBe(500);
+    });
+
 });
