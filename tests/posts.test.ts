@@ -2,7 +2,6 @@ import request from "supertest";
 import { serverURL, posts } from "./mockdata";
 import { testUser } from "../jest.setup";
 import TestUser from "./misc/auth";
-import PostModel from "../models/posts";
 
 
 describe("Posts API", () => {
@@ -168,8 +167,8 @@ describe("Posts API", () => {
     });
 
     test("Create Post -> returns 500 when DB errors", async () => {
-        jest.spyOn(PostModel, "create").mockRejectedValueOnce(new Error("DB failure"));
         const postData = {
+            _id: "invalid_id_format",
             title: "DB Error Post",
             content: "This post should trigger a DB error."
         };
@@ -183,19 +182,19 @@ describe("Posts API", () => {
 
 
     test("Get all posts -> returns 500 when DB errors", async () => {
-    jest.spyOn(PostModel, "find").mockRejectedValueOnce(new Error("DB failure"));
-    const res = await request(serverURL)
-        .get("/api/posts")
-        .set("Authorization", `Bearer ${testUser.accessToken}`);
-    expect(res.status).toBe(500);
-    expect(res.body).toHaveProperty("message");
+        // Use an invalid ObjectId in query filter to trigger DB error
+        const res = await request(serverURL)
+            .get("/api/posts?_id=invalid_id_format")
+            .set("Authorization", `Bearer ${testUser.accessToken}`);
+        expect(res.status).toBe(500);
+        expect(res.body).toHaveProperty("message");
     });
 
 
     test("Update posts -> returns 500 when DB errors", async () => {
-        jest.spyOn(PostModel, "findByIdAndUpdate").mockRejectedValueOnce(new Error("DB failure"));
+        // Use invalid ObjectId format to trigger cast error
         const res = await request(serverURL)
-            .put(`/api/posts/${posts[0]._id}`)
+            .put("/api/posts/invalid_id_format")
             .set("Authorization", `Bearer ${testUser.accessToken}`)
             .send({ title: "won't save", content: "won't save" });
         expect(res.status).toBe(500);
@@ -203,11 +202,10 @@ describe("Posts API", () => {
     });
 
 
-    // this test does not work and return 400 please fix
     test("Delete post -> returns 500 when DB errors", async () => {
-        jest.spyOn(PostModel, "findByIdAndDelete").mockRejectedValueOnce(new Error("DB failure"));
+        // Use invalid ObjectId format to trigger cast error
         const res = await request(serverURL)
-            .delete(`/api/posts/${posts[0]._id}`)
+            .delete("/api/posts/invalid_id_format")
             .set("Authorization", `Bearer ${testUser.accessToken}`);
         expect(res.status).toBe(500);
         expect(res.body).toHaveProperty("message");
