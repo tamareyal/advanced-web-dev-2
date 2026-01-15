@@ -4,6 +4,9 @@ import commentsRouter from "./routes/commentsRoutes";
 import usersRouter from "./routes/usersRoutes";
 import authRouter from "./routes/authRoutes";
 import mongoose from "mongoose";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./swagger";
+
 
 async function startServer(port: number, mongoURL: string): Promise<mongoose.Connection | void> {
   try {
@@ -30,6 +33,8 @@ function setupExpress(): Express {
   app.use("/api/comments", commentsRouter);
   app.use("/api/users", usersRouter);
   app.use("/api/auth", authRouter);
+  app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
   return app;
 }
