@@ -30,9 +30,6 @@ class CommentsController extends BaseController<Comment> {
             return res.status(400).json({ message: 'sender_id cannot be set manually' });
         }
 
-        if (!senderId) {
-            return res.status(401).json({ message: 'Unauthenticated' });
-        }
         body.sender_id = senderId;
 
         if (!body || !body.post_id || !body.message) {

@@ -210,4 +210,32 @@ describe("Posts API", () => {
         expect(res.status).toBe(500);
         expect(res.body).toHaveProperty("message");
     });
+
+    test("Create Post with no Title", async () => {
+        const postData = {
+            content: "This post has no title."
+        };
+        
+        const res = await request(serverURL)
+            .post("/api/posts")
+            .set("Authorization", `Bearer ${testUser.accessToken}`)
+            .send(postData);
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty("message");
+    });
+
+    test("Create Post with no Content", async () => {
+        const postData = {
+            title: "Title Only Post"
+        };
+        
+        const res = await request(serverURL)
+            .post("/api/posts")
+            .set("Authorization", `Bearer ${testUser.accessToken}`)
+            .send(postData);
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty("message");
+    });
 });

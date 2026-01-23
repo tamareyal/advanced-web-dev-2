@@ -223,6 +223,23 @@ describe("Comments API", () => {
         expect(res.body).toHaveProperty("message");
     });
 
+    test("Get Comment by ID -> returns 500 when DB errors", async () => {
+        const res = await request(serverURL)
+            .get("/api/comments/invalid_id_format")
+            .set("Authorization", `Bearer ${testUser.accessToken}`);
+        expect(res.status).toBe(500);
+        expect(res.body).toHaveProperty("message");
+    });
+
+    test("Get Comments by Post ID -> returns 500 when DB errors", async () => {
+        jest.spyOn(require('mongoose').Types.ObjectId, 'isValid').mockReturnValue(true);
+
+        const res = await request(serverURL)
+            .get("/api/comments/posts/invalid_id_format")
+            .set("Authorization", `Bearer ${testUser.accessToken}`);
+        expect(res.status).toBe(500);
+        expect(res.body).toHaveProperty("message");
+    });
 
     test("Update comment -> returns 500 when DB errors", async () => {
         // Use invalid ObjectId format
