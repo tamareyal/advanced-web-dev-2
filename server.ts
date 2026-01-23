@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import startServer from "./index";
 
+
 dotenv.config({ path: ".env" });
 
 const PORT = Number(process.env.PORT) || 3000;
