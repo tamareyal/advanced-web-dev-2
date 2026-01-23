@@ -7,6 +7,7 @@ const config: Config = {
     setupFilesAfterEnv: ["./jest.setup.ts"],
     roots: ["<rootDir>/tests/"],
     bail: true,
+    coverageProvider: "v8",
 };
 
 export default config;

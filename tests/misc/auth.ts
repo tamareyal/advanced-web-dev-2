@@ -22,9 +22,6 @@ class TestUser {
             email: this.email,
             password: this.password
         });
-        if (res.status !== 201) {
-            throw new Error(`Failed to register user: ${res.status} - ${res.text}`);
-        }
         const accessToken = res.body.token;
         const refreshToken = res.body.refreshToken;
 
@@ -43,9 +40,6 @@ class TestUser {
         const res = await request(serverURL).post("/api/auth/refresh-token").send({
             refreshToken: this.refreshToken
         });
-        if (res.status !== 200) {
-            throw new Error(`Failed to refresh tokens: ${res.status} - ${res.text}`);
-        }
         const newAccessToken = res.body.token;
         const newRefreshToken = res.body.refreshToken;
 

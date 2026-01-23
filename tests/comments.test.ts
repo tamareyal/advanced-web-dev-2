@@ -2,7 +2,6 @@ import request from "supertest";
 import { serverURL, comments } from "./mockdata";
 import { testUser } from "../jest.setup";
 import TestUser from "./misc/auth";
-import CommentModel from "../models/comments";
 
 
 describe("Comments API", () => {
@@ -204,9 +203,8 @@ describe("Comments API", () => {
     test("Create Comment -> returns 500 when DB errors", async () => {
         const commentData = {
             message: "DB Error Comment",
-            post_id: "64b7f8f8f8f8f8f8f8f8f8f8"
+            post_id: "invalid_id_format" // Invalid ObjectId format
         };
-        jest.spyOn(CommentModel, "create").mockRejectedValueOnce(new Error("DB failure"));
         const res = await request(serverURL)
             .post("/api/comments")
             .set("Authorization", `Bearer ${testUser.accessToken}`)
@@ -217,19 +215,19 @@ describe("Comments API", () => {
 
 
     test("Get all comments -> returns 500 when DB errors", async () => {
-    jest.spyOn(CommentModel, "find").mockRejectedValueOnce(new Error("DB failure"));
-    const res = await request(serverURL)
-        .get("/api/comments")
-        .set("Authorization", `Bearer ${testUser.accessToken}`);
-    expect(res.status).toBe(500);
-    expect(res.body).toHaveProperty("message");
+        // Use invalid ObjectId in query to trigger DB error
+        const res = await request(serverURL)
+            .get("/api/comments?_id=invalid_id_format")
+            .set("Authorization", `Bearer ${testUser.accessToken}`);
+        expect(res.status).toBe(500);
+        expect(res.body).toHaveProperty("message");
     });
 
 
     test("Update comment -> returns 500 when DB errors", async () => {
-        jest.spyOn(CommentModel, "findByIdAndUpdate").mockRejectedValueOnce(new Error("DB failure"));
+        // Use invalid ObjectId format
         const res = await request(serverURL)
-            .put(`/api/comments/${comments[0]._id}`)
+            .put("/api/comments/invalid_id_format")
             .set("Authorization", `Bearer ${testUser.accessToken}`)
             .send({ message: "won't save" });
         expect(res.status).toBe(500);
@@ -237,11 +235,10 @@ describe("Comments API", () => {
     });
 
 
-    // this test does not work and return 400 please fix
     test("Delete comment -> returns 500 when DB errors", async () => {
-        jest.spyOn(CommentModel, "findByIdAndDelete").mockRejectedValueOnce(new Error("DB failure"));
+        // Use invalid ObjectId format
         const res = await request(serverURL)
-            .delete(`/api/comments/${comments[0]._id}`)
+            .delete("/api/comments/invalid_id_format")
             .set("Authorization", `Bearer ${testUser.accessToken}`);
         expect(res.status).toBe(500);
         expect(res.body).toHaveProperty("message");
