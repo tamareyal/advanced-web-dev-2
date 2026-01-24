@@ -34,18 +34,6 @@ class BaseController<T> {
 
     // For many controllers this might need to be overwritten to add specific logic
     // such as data verification, hashing passwords, etc to the given body.
-    create = async (req: Request, res: Response) => {
-        const body = req.body;
-        try {
-            const data = await this.model.create(body);
-            return res.status(201).json(data);
-        } catch (error) {
-            return res.status(500).json({ message: error instanceof Error ? error.message : "Error" });
-        }
-    };
-
-    // For many controllers this might need to be overwritten to add specific logic
-    // such as data verification, hashing passwords, etc to the given body.
     update = async (req: Request, res: Response) => {
         const id = req.params.id;
         const body = req.body;
