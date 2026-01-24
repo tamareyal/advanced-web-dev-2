@@ -238,7 +238,7 @@ describe('Authentication Tests', () => {
         testUser.accessToken = res.body.token;
         testUser.refreshToken = res.body.refreshToken;
 
-        const res2 = await request(serverURL)
+        const res2 = await request(expressApp)
             .post('/api/auth/refresh-token')
             .send({ refreshToken: oldRefreshToken });
         
@@ -270,7 +270,7 @@ describe('Authentication Tests', () => {
             'AnotherPassword123'
         );
 
-        const res = await request(serverURL)
+        const res = await request(expressApp)
             .post('/api/auth/register')
             .send(newUser);
         
@@ -326,12 +326,45 @@ describe('Authentication Tests', () => {
             password: 'WrongPassword123'
         };
 
-        const res = await request(serverURL)
+        const res = await request(expressApp)
             .post('/api/auth/login')
             .send(credentials);
         
         expect(res.status).toBe(401);
         expect(res.body.message).toBe('Invalid credentials');
+    });
+
+    test("Login with DB error", async () => {
+        const req = {
+            body: {
+                username: testUser.username,
+                password: testUser.password,
+            },
+        } as any;
+
+        jest.spyOn(UserModel, 'findOne').mockImplementationOnce(() => {
+            throw new Error('Database failure');
+        });
+        const res = await request(expressApp)
+            .post('/api/auth/login')
+            .send({ username: testUser.username, password: testUser.password });
+        
+        expect(res.status).toBe(500);
+        expect(res.body).toHaveProperty('message', 'Server error');
+    });
+
+
+    test("Refresh tokens with DB error", async () => {
+        jest.spyOn(UserModel, 'findById').mockImplementationOnce(() => {
+            throw new Error('Database failure');
+        });
+
+        const res = await request(expressApp)
+            .post('/api/auth/refresh-token')
+            .send({ refreshToken: testUser.refreshToken });
+        
+        expect(res.status).toBe(500);
+        expect(res.body).toHaveProperty('message', 'Server error');
     });
 
 });
