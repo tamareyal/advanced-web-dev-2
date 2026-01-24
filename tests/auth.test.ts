@@ -1,6 +1,6 @@
 import request from "supertest";
 import { serverURL } from "./mockdata";
-import { testUser } from "../jest.setup";
+import { testUser, expressApp } from "../jest.setup";
 import TestUser from "./misc/auth";
 import { AuthenticatedRequest, authenticate, authorizeOwner } from "../middlewares/authMiddleware";
 import { Response } from "express";
@@ -34,7 +34,7 @@ describe('Authentication Tests', () => {
             password: 'NewTestPassword123'
         };
 
-        const res = await request(serverURL)
+        const res = await request(expressApp)
             .post('/api/auth/register')
             .send(newtestuser);
         
@@ -182,7 +182,7 @@ describe('Authentication Tests', () => {
 
 
     test('Refresh tokens without refresh token', async () => {
-         const res = await request(serverURL)
+         const res = await request(expressApp)
         .post('/api/auth/refresh-token')
         .send({}); // no refreshToken provided
 
@@ -318,6 +318,20 @@ describe('Authentication Tests', () => {
         expect(jsonMock).toHaveBeenCalledWith({ message: "Unauthenticated" });
         expect(next).not.toHaveBeenCalled();
         expect(model.findById).not.toHaveBeenCalled();
+    });
+
+    test("Login with invalid credentials username", async () => {
+        const credentials = {
+            username: testUser.username,
+            password: 'WrongPassword123'
+        };
+
+        const res = await request(serverURL)
+            .post('/api/auth/login')
+            .send(credentials);
+        
+        expect(res.status).toBe(401);
+        expect(res.body.message).toBe('Invalid credentials');
     });
 
 });

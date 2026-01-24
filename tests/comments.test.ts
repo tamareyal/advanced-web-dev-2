@@ -1,6 +1,6 @@
 import request from "supertest";
 import { serverURL, comments } from "./mockdata";
-import { testUser } from "../jest.setup";
+import { expressApp, testUser } from "../jest.setup";
 import TestUser from "./misc/auth";
 
 
@@ -182,7 +182,7 @@ describe("Comments API", () => {
 
     test("Attempt to delete a non-existent Comment", async () => {
         const nonExistentCommentId = "64b7f8f8f8f8f8f8f8f8f8f8"; // Assuming this ID does not exist
-        const res = await request(serverURL)
+        const res = await request(expressApp)
             .delete(`/api/comments/${nonExistentCommentId}`)
             .set("Authorization", `Bearer ${testUser.accessToken}`);
         
