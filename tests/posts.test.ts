@@ -238,4 +238,14 @@ describe("Posts API", () => {
         expect(res.status).toBe(400);
         expect(res.body).toHaveProperty("message");
     });
+  
+    test("Attempt to update with invalid token", async () => {
+        const res = await request(serverURL)
+            .put(`/api/posts/${posts[0]._id}`)
+            .set("Authorization", `Bearer invalidtoken123`)
+            .send({ title: "Trying to update with invalid token", content: "Trying to update with invalid token content" });
+        
+        expect(res.status).toBe(401);
+        expect(res.body.message).toBe("Invalid token");
+    });
 });

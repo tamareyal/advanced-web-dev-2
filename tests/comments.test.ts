@@ -152,7 +152,7 @@ describe("Comments API", () => {
         expect(res.body.message).toBe("Forbidden: unable to perform operation on resource not owned by you");
     });
 
-        test("Attempt to update with a different user", async () => {
+    test("Attempt to update with a different user", async () => {
         const tempUser = new TestUser(
             "tempuser2",
             "tempuser2@example.com",
@@ -167,6 +167,16 @@ describe("Comments API", () => {
         
         expect(res.status).toBe(403);
         expect(res.body.message).toBe("Forbidden: unable to perform operation on resource not owned by you");
+    });
+
+    test("Attempt to update with invalid token", async () => {
+        const res = await request(serverURL)
+            .put(`/api/comments/${comments[0]._id}`)
+            .set("Authorization", `Bearer invalidtoken123`)
+            .send({ message: "Trying to update with invalid token" });
+        
+        expect(res.status).toBe(401);
+        expect(res.body.message).toBe("Invalid token");
     });
 
 
