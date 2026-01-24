@@ -1,13 +1,13 @@
 import request from "supertest";
 import { serverURL, posts } from "./mockdata";
-import { testUser } from "../jest.setup";
+import { testUser, expressApp } from "../jest.setup";
 import TestUser from "./misc/auth";
 
 
 describe("Posts API", () => {
     test("Create Posts", async () => {
         for (const postData of posts) {
-            const res = await request(serverURL)
+            const res = await request(expressApp)
                 .post("/api/posts")
                 .set("Authorization", `Bearer ${testUser.accessToken}`)
                 .send(postData);
@@ -78,17 +78,18 @@ describe("Posts API", () => {
     test("Delete a Post", async () => {
         const postToDelete = posts[2];
         
-        const res = await request(serverURL)
+        const res = await request(expressApp)
             .delete(`/api/posts/${postToDelete._id}`)
             .set("Authorization", `Bearer ${testUser.accessToken}`);
         
         expect(res.status).toBe(200);
         
-        const getRes = await request(serverURL)
+        const getRes = await request(expressApp)
             .get(`/api/posts/${postToDelete._id}`)
             .set("Authorization", `Bearer ${testUser.accessToken}`);
         
         expect(getRes.status).toBe(404);
+        expect(getRes.body.message).toBe("Resource not found");
     });
 
     test("Create Post without Authentication", async () => {
@@ -193,7 +194,7 @@ describe("Posts API", () => {
 
     test("Update posts -> returns 500 when DB errors", async () => {
         // Use invalid ObjectId format to trigger cast error
-        const res = await request(serverURL)
+        const res = await request(expressApp)
             .put("/api/posts/invalid_id_format")
             .set("Authorization", `Bearer ${testUser.accessToken}`)
             .send({ title: "won't save", content: "won't save" });
@@ -204,7 +205,7 @@ describe("Posts API", () => {
 
     test("Delete post -> returns 500 when DB errors", async () => {
         // Use invalid ObjectId format to trigger cast error
-        const res = await request(serverURL)
+        const res = await request(expressApp)
             .delete("/api/posts/invalid_id_format")
             .set("Authorization", `Bearer ${testUser.accessToken}`);
         expect(res.status).toBe(500);

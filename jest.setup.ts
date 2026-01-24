@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import startServer from "./index";
 import TestUser from "./tests/misc/auth";
 import { serverURL } from "./tests/mockdata";
+import { Express } from "express";
 
 dotenv.config({ path: ".env.test" });
 
@@ -14,12 +15,14 @@ const testUser = new TestUser(
     "tester@example.com",
     "securePassword123"
 );
+let expressApp: Express = null as any;
 
 jest.setTimeout(20000);
 
 beforeAll(async () => {
     // Start testing server
-    const conn = await startServer(PORT, MONGO_URI);
+    const [conn, app] = await startServer(PORT, MONGO_URI);
+    expressApp = app;
     // Clear database before running tests
     if (conn) {
         await clearDatabase(conn);
@@ -47,5 +50,5 @@ async function clearDatabase(connection: mongoose.Connection) {
     }
 }
 
-export { testUser };
+export { testUser, expressApp };
 

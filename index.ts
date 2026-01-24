@@ -8,7 +8,7 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./swagger";
 
 
-async function startServer(port: number, mongoURL: string): Promise<mongoose.Connection | void> {
+async function startServer(port: number, mongoURL: string): Promise<[mongoose.Connection, Express]> {
   try {
     const connection = await connectToDatabase(mongoURL);
 
@@ -17,7 +17,7 @@ async function startServer(port: number, mongoURL: string): Promise<mongoose.Con
       console.log(`Server is running on port ${port}`);
     });
 
-    return connection;
+    return [connection, app];
   } catch (error) {
     console.error(`Failed to start server: ${error}`);
     throw error;
