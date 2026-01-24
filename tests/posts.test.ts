@@ -211,7 +211,35 @@ describe("Posts API", () => {
         expect(res.body).toHaveProperty("message");
     });
 
-        test("Attempt to update with invalid token", async () => {
+    test("Create Post with no Title", async () => {
+        const postData = {
+            content: "This post has no title."
+        };
+        
+        const res = await request(serverURL)
+            .post("/api/posts")
+            .set("Authorization", `Bearer ${testUser.accessToken}`)
+            .send(postData);
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty("message");
+    });
+
+    test("Create Post with no Content", async () => {
+        const postData = {
+            title: "Title Only Post"
+        };
+        
+        const res = await request(serverURL)
+            .post("/api/posts")
+            .set("Authorization", `Bearer ${testUser.accessToken}`)
+            .send(postData);
+
+        expect(res.status).toBe(400);
+        expect(res.body).toHaveProperty("message");
+    });
+  
+    test("Attempt to update with invalid token", async () => {
         const res = await request(serverURL)
             .put(`/api/posts/${posts[0]._id}`)
             .set("Authorization", `Bearer invalidtoken123`)
@@ -220,5 +248,4 @@ describe("Posts API", () => {
         expect(res.status).toBe(401);
         expect(res.body.message).toBe("Invalid token");
     });
-
 });

@@ -8,6 +8,17 @@ const config: Config = {
     roots: ["<rootDir>/tests/"],
     bail: true,
     coverageProvider: "v8",
+    collectCoverageFrom: [
+        '**/*.ts',
+        '!**/*.test.ts',      
+        '!**/tests/**',
+        '!**/node_modules/**',
+        '!**/dist/**',
+        '!**/coverage/**',
+        '!swagger.ts',        
+        '!server.ts',
+        '!index.ts',
+    ],
 };
 
 export default config;

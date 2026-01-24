@@ -16,9 +16,6 @@ class PostsController extends BaseController<Post> {
             return res.status(400).json({ message: 'sender_id cannot be set manually' });
         }
 
-        if (!senderId) {
-            return res.status(401).json({ message: 'Unauthenticated' });
-        }
         body.sender_id = senderId;
 
         if (!body || !body.title || !body.content) {
