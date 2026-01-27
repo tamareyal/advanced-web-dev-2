@@ -2,6 +2,8 @@ import request from "supertest";
 import { serverURL, comments } from "./mockdata";
 import { expressApp, testUser } from "../jest.setup";
 import TestUser from "./misc/auth";
+import { authenticate, AuthenticatedRequest } from "../middlewares/authMiddleware";
+import { Response, NextFunction } from "express";
 import CommentsModel from '../models/comments';
 
 
@@ -145,7 +147,7 @@ describe("Comments API", () => {
 
         const commentToDelete = comments[0];
         
-        const res = await request(serverURL)
+        const res = await request(expressApp)
             .delete(`/api/comments/${commentToDelete._id}`)
             .set("Authorization", `Bearer ${tempUser.accessToken}`);
         
@@ -171,7 +173,7 @@ describe("Comments API", () => {
     });
 
     test("Attempt to update with invalid token", async () => {
-        const res = await request(serverURL)
+        const res = await request(expressApp)
             .put(`/api/comments/${comments[0]._id}`)
             .set("Authorization", `Bearer invalidtoken123`)
             .send({ message: "Trying to update with invalid token" });
@@ -273,6 +275,24 @@ describe("Comments API", () => {
             .set("Authorization", `Bearer ${testUser.accessToken}`);
         expect(res.status).toBe(500);
         expect(res.body).toHaveProperty("message");
+    });
+
+    test('returns 401 when Authorization header is missing',async () => {
+        const req = {
+        headers: {},
+        } as AuthenticatedRequest;
+
+        const res = {} as Response;
+        res.status = jest.fn().mockReturnValue(res);
+        res.json = jest.fn().mockReturnValue(res);
+
+        const mockNext = jest.fn() as NextFunction
+
+        authenticate(req, res, mockNext);
+
+        expect(res.status).toHaveBeenCalledWith(401);
+        expect(res.json).toHaveBeenCalledWith({ message: 'Authorization header missing' });
+        expect(mockNext).not.toHaveBeenCalled();
     });
     
 });

@@ -130,7 +130,7 @@ describe("Posts API", () => {
 
         const postToDelete = posts[0];
         
-        const res = await request(serverURL)
+        const res = await request(expressApp)
             .delete(`/api/posts/${postToDelete._id}`)
             .set("Authorization", `Bearer ${tempUser.accessToken}`);
         
@@ -241,7 +241,7 @@ describe("Posts API", () => {
     });
   
     test("Attempt to update with invalid token", async () => {
-        const res = await request(serverURL)
+        const res = await request(expressApp)
             .put(`/api/posts/${posts[0]._id}`)
             .set("Authorization", `Bearer invalidtoken123`)
             .send({ title: "Trying to update with invalid token", content: "Trying to update with invalid token content" });
