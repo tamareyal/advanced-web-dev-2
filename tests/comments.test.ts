@@ -4,6 +4,7 @@ import { expressApp, testUser } from "../jest.setup";
 import TestUser from "./misc/auth";
 import { authenticate, AuthenticatedRequest } from "../middlewares/authMiddleware";
 import { Response, NextFunction } from "express";
+import CommentsModel from '../models/comments';
 
 
 describe("Comments API", () => {
@@ -244,13 +245,16 @@ describe("Comments API", () => {
     });
 
     test("Get Comments by Post ID -> returns 500 when DB errors", async () => {
-        jest.spyOn(require('mongoose').Types.ObjectId, 'isValid').mockReturnValue(true);
+        const findSpy = jest.spyOn(CommentsModel, 'find').mockRejectedValueOnce(new Error('Database error'));
 
-        const res = await request(serverURL)
-            .get("/api/comments/posts/invalid_id_format")
+        const validObjectId = '507f1f77bcf86cd799439011';
+        const res = await request(expressApp)
+            .get(`/api/comments/posts/${validObjectId}`)
             .set("Authorization", `Bearer ${testUser.accessToken}`);
         expect(res.status).toBe(500);
         expect(res.body).toHaveProperty("message");
+        
+        findSpy.mockRestore();
     });
 
     test("Update comment -> returns 500 when DB errors", async () => {
