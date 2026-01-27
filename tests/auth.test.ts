@@ -220,12 +220,16 @@ describe('Authentication Tests', () => {
     });
 
     test('Refresh tokens with invalid token', async () => {
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+        
         const res = await request(serverURL)
             .post('/api/auth/refresh-token')
             .send({ refreshToken: 'InvalidRefreshToken' });
         
         expect(res.status).toBe(500);
         expect(res.body.message).toBe('Server error');
+        
+        consoleErrorSpy.mockRestore();
     });
 
     test('Refresh tokens with expired token', async () => {
@@ -355,6 +359,8 @@ describe('Authentication Tests', () => {
 
 
     test("Refresh tokens with DB error", async () => {
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+        
         jest.spyOn(UserModel, 'findById').mockImplementationOnce(() => {
             throw new Error('Database failure');
         });
@@ -365,6 +371,8 @@ describe('Authentication Tests', () => {
         
         expect(res.status).toBe(500);
         expect(res.body).toHaveProperty('message', 'Server error');
+        
+        consoleErrorSpy.mockRestore();
     });
 
 });
